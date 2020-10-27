@@ -43,3 +43,162 @@ SELECT gender, COUNT(name) FROM employee_payroll GROUP BY gender;
 SELECT gender, SUM(salary) FROM employee_payroll GROUP BY gender;
 SELECT gender, MIN(salary) FROM employee_payroll GROUP BY gender;
 SELECT gender, MAX(salary) FROM employee_payroll GROUP BY gender;
+
+#UC8
+ALTER TABLE employee_payroll ADD phone_number VARCHAR(250) AFTER name; 		 #Adding phone_number field
+ALTER TABLE employee_payroll ADD address VARCHAR(250) AFTER phone_number; 	 #Adding address field
+ALTER TABLE employee_payroll ADD department VARCHAR(150) NOT NULL AFTER address; #Adding department field 
+ALTER TABLE employee_payroll ALTER address SET DEFAULT 'TBD'; 
+
+#UC9
+ALTER TABLE employee_payroll RENAME COLUMN salary TO basic_pay;
+ALTER TABLE employee_payroll ADD deductions Double NOT NULL AFTER basic_pay;
+ALTER TABLE employee_payroll ADD taxable_pay Double NOT NULL AFTER deductions;
+ALTER TABLE employee_payroll ADD tax Double NOT NULL AFTER taxable_pay;
+ALTER TABLE employee_payroll ADD net_pay Double NOT NULL AFTER tax;
+
+#UC10
+ER DIAGRAM
+
+#UC11
+CREATE TABLE company						#Normalising the above table into smaller tables
+(
+ company_id 	INT PRIMARY KEY, 				#Company id as primary key
+ company_name 	VARCHAR(30) NOT NULL
+);
+
+CREATE TABLE employee 						#Employee data table
+(
+ id 		INT unsigned NOT NULL AUTO_INCREMENT PRIMARY KEY,
+ company_id 	INT REFERENCES company(company_id),
+ phone_number 	VARCHAR(20) NOT NULL,
+ address 	VARCHAR(50) NOT NULL DEFAULT 'TBD',
+ gender 	CHAR(1) NOT NULL
+);
+
+CREATE TABLE payroll
+(
+ emp_id 	INT REFERENCES employee(id),
+ basic_pay 	DOUBLE NOT NULL,
+ deductions 	DOUBLE NOT NULL,
+ taxable_pay 	DOUBLE NOT NULL,
+ tax 		DOUBLE NOT NULL,
+ net_pay 	DOUBLE NOT NULL
+);
+
+CREATE TABLE department
+(
+ dept_id 	INT PRIMARY KEY,
+ dept_name 	VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE employee_department
+(
+ emp_id 	INT REFERENCES employee(id),
+ dept_id 	INT REFERENCES department(dept_id)
+);
+
+INSERT INTO company VALUES 					#Inserting data to company table
+ 	(1,'Capgemini'),
+ 	(2,'Company B'),
+ 	(3,'Company C');
+
+mysql> select * from company
+    -> ;
++------------+--------------+
+| company_id | company_name |
++------------+--------------+
+|          1 | Capgemini    |
+|          2 | Company B    |
+|          3 | Company C    |
++------------+--------------+
+3 rows in set (0.00 sec)
+
+ALTER TABLE employee 
+ADD COLUMN employee_name VARCHAR(20) NOT NULL AFTER company_id;
+
+INSERT INTO employee VALUES 					#Inserting data to employee table
+ 	(101, 1, 'Bill', '9876543210', 'California', 'M' ),
+	(102, 1, 'Terisa', '8876543211', 'San Francisco', 'F' ),
+	(103, 2, 'Charlie', '7876543212', 'New York', 'M' );
+
+mysql> SELECT * FROM employee;
++-----+------------+---------------+--------------+---------------+--------+
+| id  | company_id | employee_name | phone_number | address       | gender |
++-----+------------+---------------+--------------+---------------+--------+
+| 101 |          1 | Bill          | 9876543210   | California    | M      |
+| 102 |          1 | Terisa        | 8876543211   | San Francisco | F      |
+| 103 |          2 | Charlie       | 7876543212   | New York      | M      |
++-----+------------+---------------+--------------+---------------+--------+
+3 rows in set (0.00 sec)
+
+INSERT INTO payroll VALUES 					#Inserting data to payroll table corresponding to employee
+ 	(101,50000,5000,45000,5000,40000),
+ 	(102,20000,2000,18000,3000,15000),
+ 	(103,60000,6000,54000,4000,50000);
+
+mysql> select * from payroll;
++--------+-----------+------------+-------------+------+---------+
+| emp_id | basic_pay | deductions | taxable_pay | TAX  | NET_PAY |
++--------+-----------+------------+-------------+------+---------+
+|    101 |     50000 |       5000 |       45000 | 5000 |   40000 |
+|    102 |     20000 |       2000 |       18000 | 3000 |   15000 |
+|    103 |     60000 |       6000 |       54000 | 4000 |   50000 |
++--------+-----------+------------+-------------+------+---------+
+3 rows in set (0.00 sec)
+
+INSERT INTO department VALUES  					#Inserting data to department table 
+ 	(201, 'Sales'),
+ 	(202, 'Marketing'),
+ 	(203, 'Logistics'),
+ 	(204, 'Management');
+
+mysql> select * from department;
++---------+------------+
+| dept_id | dept_name  |
++---------+------------+
+|     201 | Sales      |
+|     202 | Marketing  |
+|     203 | Logistics  |
+|     204 | Management |
++---------+------------+
+4 rows in set (0.00 sec)
+
+INSERT INTO employee_department VALUES  			#Inserting data to emp_department table 	
+ 	(101,203),
+ 	(102,201),
+ 	(102,202),
+ 	(103,204);
+
+mysql> Select * from employee_department;
++--------+---------+
+| emp_id | dept_id |
++--------+---------+
+|    101 |     203 |
+|    102 |     201 |
+|    102 |     202 |
+|    103 |     204 |
++--------+---------+
+4 rows in set (0.00 sec)
+
+SELECT gender,COUNT(id) FROM employee 				#Get number of male and female employees
+GROUP BY gender;
++--------+-----------+
+| gender | COUNT(id) |
++--------+-----------+
+| M      |         2 |
+| F      |         1 |
++--------+-----------+
+2 rows in set (0.01 sec)
+
+SELECT net_pay FROM PAYROLL WHERE emp_id =(
+ 	SELECT id FROM employee where gender = 'F'
+ 	);
++---------+
+| net_pay |
++---------+
+|   15000 |
++---------+
+1 row in set (0.01 sec)
+
+SELECT SUM(net_pay) FROM payroll where 

@@ -16,37 +16,27 @@
 /*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
 
 --
--- Table structure for table `employee_payroll`
+-- Table structure for table `department`
 --
 
-DROP TABLE IF EXISTS `employee_payroll`;
+DROP TABLE IF EXISTS `department`;
 /*!40101 SET @saved_cs_client     = @@character_set_client */;
 /*!50503 SET character_set_client = utf8mb4 */;
-CREATE TABLE `employee_payroll` (
-  `id` int unsigned NOT NULL AUTO_INCREMENT,
-  `name` varchar(150) NOT NULL,
-  `phone_number` varchar(250) DEFAULT NULL,
-  `address` varchar(250) DEFAULT 'TBD',
-  `department` varchar(150) NOT NULL,
-  `gender` char(1) DEFAULT NULL,
-  `basic_pay` double NOT NULL,
-  `deductions` double NOT NULL,
-  `taxable_pay` double NOT NULL,
-  `tax` double NOT NULL,
-  `net_pay` double NOT NULL,
-  `start` date NOT NULL,
-  PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=4 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
+CREATE TABLE `department` (
+  `dept_id` int NOT NULL,
+  `dept_name` varchar(50) NOT NULL,
+  PRIMARY KEY (`dept_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_0900_ai_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
 --
--- Dumping data for table `employee_payroll`
+-- Dumping data for table `department`
 --
 
-LOCK TABLES `employee_payroll` WRITE;
-/*!40000 ALTER TABLE `employee_payroll` DISABLE KEYS */;
-INSERT INTO `employee_payroll` VALUES (1,'Bill',NULL,NULL,'','M',1000000,0,0,0,0,'2018-01-03'),(2,'Terisa',NULL,NULL,'','F',3000000,0,0,0,0,'2019-11-13'),(3,'Charlie',NULL,NULL,'','M',3000000,0,0,0,0,'2020-05-21');
-/*!40000 ALTER TABLE `employee_payroll` ENABLE KEYS */;
+LOCK TABLES `department` WRITE;
+/*!40000 ALTER TABLE `department` DISABLE KEYS */;
+INSERT INTO `department` VALUES (201,'Sales'),(202,'Marketing'),(203,'Logistics'),(204,'Management');
+/*!40000 ALTER TABLE `department` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
 
