@@ -201,4 +201,106 @@ SELECT net_pay FROM PAYROLL WHERE emp_id =(
 +---------+
 1 row in set (0.01 sec)
 
-SELECT SUM(net_pay) FROM payroll where 
+SELECT SUM(p.net_pay) FROM employee e left join payroll p
+on  p.emp_id = e.id 
+GROUP BY e.gender;
+
++----------------+
+| SUM(p.net_pay) |
++----------------+
+|          90000 |
+|          15000 |
++----------------+
+
+SELECT AVG(p.net_pay) FROM employee e left join payroll p
+on  p.emp_id = e.id 
+GROUP BY e.gender;
+
++----------------+
+| AVG(p.net_pay) |
++----------------+
+|          45000 |
+|          15000 |
++----------------+
+2 rows in set (0.01 sec)
+
+SELECT MAX(p.net_pay) FROM employee e left join payroll p
+on  p.emp_id = e.id 
+GROUP BY e.gender;
+
++----------------+
+| MAX(p.net_pay) |
++----------------+
+|          50000 |
+|          15000 |
++----------------+
+2 rows in set (0.00 sec)
+
+SELECT MIN(p.net_pay) FROM employee e left join payroll p
+on  p.emp_id = e.id 
+GROUP BY e.gender;
+
++----------------+
+| MIN(p.net_pay) |
++----------------+
+|          40000 |
+|          15000 |
++----------------+
+2 rows in set (0.00 sec)
+
+ #ADDING FOREIGN KEYS TO MAKE RELATIONS AMONG TABLE
+
+ALTER TABLE employee_department
+ADD PRIMARY KEY(emp_id,dept_id);
+
+ALTER TABLE employee
+ADD FOREIGN KEY(company_id) REFERENCES company(company_id);
+
+ALTER TABLE employee 
+MODIFY id INT;
+
+DESCRIBE employee
++---------------+-------------+------+-----+---------+-------+
+| Field         | Type        | Null | Key | Default | Extra |
++---------------+-------------+------+-----+---------+-------+
+| id            | int         | NO   | PRI | NULL    |       |
+| company_id    | int         | YES  | MUL | NULL    |       |
+| employee_name | varchar(20) | NO   |     | NULL    |       |
+| phone_number  | varchar(20) | NO   |     | NULL    |       |
+| address       | varchar(50) | NO   |     | TBD     |       |
+| gender        | char(1)     | NO   |     | NULL    |       |
++---------------+-------------+------+-----+---------+-------+
+
+ALTER TABLE payroll
+ADD FOREIGN KEY(emp_id) REFERENCES employee(id);
+
+ALTER TABLE employee_department
+ADD FOREIGN KEY(emp_id) REFERENCES employee(id);
+
+ALTER TABLE employee_department
+ADD FOREIGN KEY(dept_id) REFERENCES department(dept_id);
+
+describe payroll;
++-------------+--------+------+-----+---------+-------+
+| Field       | Type   | Null | Key | Default | Extra |
++-------------+--------+------+-----+---------+-------+
+| emp_id      | int    | YES  | MUL | NULL    |       |
+| basic_pay   | double | NO   |     | NULL    |       |
+| deductions  | double | NO   |     | NULL    |       |
+| taxable_pay | double | NO   |     | NULL    |       |
+| TAX         | double | NO   |     | NULL    |       |
+| NET_PAY     | double | NO   |     | NULL    |       |
++-------------+--------+------+-----+---------+-------+
+6 rows in set (0.01 sec)
+
+describe employee_department;
++---------+------+------+-----+---------+-------+
+| Field   | Type | Null | Key | Default | Extra |
++---------+------+------+-----+---------+-------+
+| emp_id  | int  | NO   | PRI | NULL    |       |
+| dept_id | int  | NO   | PRI | NULL    |       |
++---------+------+------+-----+---------+-------+
+2 rows in set (0.00 sec)
+
+
+ 
